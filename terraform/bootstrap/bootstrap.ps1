@@ -57,9 +57,13 @@ if (-not (az storage container-rm list --storage-account $StateAccount -g $State
 Write-Host 'GitHub Actions identity...' -ForegroundColor Cyan
 $id = az identity create -n $IdentityName -g $StateRg -l $Location | ConvertFrom-Json
 
+# GitHub's OIDC subject includes immutable owner/repo IDs: repo:<owner>@<ownerId>/<repo>@<repoId>
+$gh      = gh api "repos/$GitHubRepo" | ConvertFrom-Json
+$subject = "repo:$($gh.owner.login)@$($gh.owner.id)/$($gh.name)@$($gh.id)"
+
 @{
-    'github-main' = "repo:${GitHubRepo}:ref:refs/heads/main"
-    'github-pr'   = "repo:${GitHubRepo}:pull_request"
+    'github-main' = "${subject}:ref:refs/heads/main"
+    'github-pr'   = "${subject}:pull_request"
 }.GetEnumerator() | ForEach-Object {
     az identity federated-credential create --name $_.Key --identity-name $IdentityName -g $StateRg `
         --issuer 'https://token.actions.githubusercontent.com' --subject $_.Value `
