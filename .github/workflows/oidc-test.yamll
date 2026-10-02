@@ -1,0 +1,26 @@
+name: OIDC smoke test
+
+on: workflow_dispatch
+
+permissions:
+  id-token: write   # lets the job request a GitHub OIDC token
+  contents: read
+
+jobs:
+  login:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure login (OIDC, no secrets)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Verify subscription and state access
+        shell: pwsh
+        run: |
+          az account show --query "{subscription:name, tenant:tenantId}" -o table
+          az storage blob list --account-name ${{ vars.TF_STATE_ACCOUNT }} `
+            --container-name ${{ vars.TF_STATE_CONTAINER }} --auth-mode login -o table
+          'OIDC login and state access work.'
