@@ -1,0 +1,68 @@
+name: Terraform
+
+on:
+  pull_request:
+    paths: ['terraform/**', '.github/workflows/terraform.yml']
+  push:
+    branches: [main]
+    paths: ['terraform/**', '.github/workflows/terraform.yml']
+  workflow_dispatch:
+
+permissions:
+  id-token: write        # OIDC token for Azure
+  contents: read
+  pull-requests: write   # post the plan as a PR comment
+
+# Never run two Terraform jobs against the same state at once.
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
+env:
+  ARM_USE_OIDC: true
+  ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  TF_VAR_admin_object_id: ${{ vars.ADMIN_OBJECT_ID }}
+  TF_VAR_deployer_object_id: ${{ vars.DEPLOYER_OBJECT_ID }}
+  TF_IN_AUTOMATION: true
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Format check
+        run: terraform fmt -check -recursive
+
+      - name: Init
+        run: terraform init -input=false
+
+      - name: Validate
+        run: terraform validate
+
+      - name: Plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Comment plan on PR
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $plan = terraform show -no-color tfplan | Out-String
+          if ($plan.Length -gt 60000) { $plan = '...(truncated)' + $plan.Substring($plan.Length - 60000) }
+          "### Terraform plan`n``````text`n$plan`n``````" | Set-Content plan.md
+          gh pr comment ${{ github.event.pull_request.number }} --body-file plan.md
+
+      - name: Apply
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: terraform apply -input=false -auto-approve tfplan
