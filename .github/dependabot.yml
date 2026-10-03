@@ -1,0 +1,19 @@
+# Weekly PRs for outdated dependencies. Each PR runs the normal plan/build/dry-run checks,
+# so an update is reviewed and deployed exactly like any other change.
+version: 2
+updates:
+  - package-ecosystem: github-actions      # actions/checkout, azure/login, ...
+    directory: /
+    schedule: { interval: weekly }
+
+  - package-ecosystem: terraform           # azurerm and helm providers
+    directory: /terraform
+    schedule: { interval: weekly }
+
+  - package-ecosystem: docker              # nginx base image
+    directory: /site
+    schedule: { interval: weekly }
+
+  - package-ecosystem: docker              # image tags in Kubernetes manifests (GoatCounter)
+    directory: /k8s
+    schedule: { interval: weekly }
