@@ -37,6 +37,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # Azure CLI sign-in via OIDC; the Helm provider's kubelogin reuses it to reach the cluster.
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install kubelogin
+        run: sudo az aks install-cli --only-show-errors
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
