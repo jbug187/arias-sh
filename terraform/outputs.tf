@@ -15,6 +15,10 @@ output "key_vault_name" {
   value = azurerm_key_vault.main.name
 }
 
+output "eso_client_id" {
+  value = azurerm_user_assigned_identity.eso.client_id
+}
+
 output "oidc_issuer_url" {
   value = azurerm_kubernetes_cluster.main.oidc_issuer_url
 }
