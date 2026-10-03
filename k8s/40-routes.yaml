@@ -1,0 +1,72 @@
+# Traefik routing for the site.
+#   https://john.arias.sh  -> site
+#   https://arias.sh/*     -> 301 https://john.arias.sh/*
+#   http://*               -> 301 to https (Let's Encrypt renewal challenges still get through)
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: to-john
+  namespace: web
+spec:
+  redirectRegex:
+    regex: ^https?://arias\.sh/(.*)
+    replacement: https://john.arias.sh/${1}
+    permanent: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: to-https
+  namespace: web
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: hsts
+  namespace: web
+spec:
+  headers:
+    stsSeconds: 31536000   # browsers remember to use HTTPS for a year
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: site-https
+  namespace: web
+spec:
+  entryPoints: [websecure]
+  routes:
+    - match: Host(`john.arias.sh`)
+      kind: Rule
+      middlewares: [{ name: hsts }]
+      services: [{ name: site, port: 80 }]
+    - match: Host(`arias.sh`)
+      kind: Rule
+      middlewares: [{ name: to-john }]
+      services: [{ name: site, port: 80 }]   # never reached; the redirect answers first
+  tls:
+    secretName: arias-tls
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: site-http
+  namespace: web
+spec:
+  entryPoints: [web]
+  routes:
+    # Priority 1 = lowest, so cert-manager's temporary challenge routes always win.
+    - match: Host(`arias.sh`)
+      kind: Rule
+      priority: 1
+      middlewares: [{ name: to-john }]
+      services: [{ name: site, port: 80 }]
+    - match: Host(`john.arias.sh`) || Host(`stats.arias.sh`)
+      kind: Rule
+      priority: 1
+      middlewares: [{ name: to-https }]
+      services: [{ name: site, port: 80 }]
