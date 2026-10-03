@@ -26,6 +26,9 @@ spec:
     metadata:
       labels: { app: goatcounter }
     spec:
+      # Kubernetes injects GOATCOUNTER_PORT=tcp://... for the "goatcounter" Service, which
+      # GoatCounter misreads as its own -port flag. Turn those legacy variables off.
+      enableServiceLinks: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000      # the image's goatcounter user
