@@ -1,0 +1,73 @@
+name: Site
+
+on:
+  pull_request:
+    paths: ['site/**', '.github/workflows/site.yml']
+  push:
+    branches: [main]
+    paths: ['site/**', '.github/workflows/site.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write   # push to GitHub Container Registry
+  id-token: write   # Azure OIDC for the deploy job
+
+env:
+  IMAGE: ghcr.io/jbug187/arias-site
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      # PRs build only (proves the image builds); main also pushes, tagged with the commit SHA.
+      - uses: docker/build-push-action@v6
+        with:
+          context: site
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+          labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install kubectl and kubelogin
+        run: sudo az aks install-cli --only-show-errors
+
+      - name: Connect to AKS
+        run: |
+          az aks get-credentials -g rg-arias-sh -n aks-arias-sh --overwrite-existing
+          kubelogin convert-kubeconfig -l azurecli
+
+      - name: Roll out new image
+        run: |
+          if (-not (kubectl get deployment site -n web --ignore-not-found)) {
+            'Deployment not created yet (k8s/30-site.yaml); image pushed, skipping rollout.'
+            exit 0
+          }
+          kubectl set image deployment/site site="$env:IMAGE`:${{ github.sha }}" -n web
+          kubectl rollout status deployment/site -n web --timeout=120s
