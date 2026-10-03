@@ -17,3 +17,10 @@ resource "azurerm_role_assignment" "kv_admin" {
   role_definition_name = "Key Vault Secrets Officer"
   principal_id         = var.admin_object_id
 }
+
+# The rotation workflow (Phase 8) writes new secret versions.
+resource "azurerm_role_assignment" "kv_deployer" {
+  scope                = azurerm_key_vault.main.id
+  role_definition_name = "Key Vault Secrets Officer"
+  principal_id         = var.deployer_object_id
+}
