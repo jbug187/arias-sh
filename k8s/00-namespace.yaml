@@ -1,0 +1,5 @@
+# All site workloads (site, GoatCounter) and their TLS secret live here.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: web
