@@ -32,7 +32,7 @@ jobs:
           password: ${{ github.token }}
 
       # PRs build only (proves the image builds); main also pushes, tagged with the commit SHA.
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: site
           push: ${{ github.event_name != 'pull_request' }}
