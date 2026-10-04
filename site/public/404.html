@@ -1,9 +1,72 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><title>Not found</title></head>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 — john.arias.sh</title>
+<meta name="description" content="Page not found.">
+<meta name="theme-color" content="#0b0e12">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #0b0e12; }
+  * { box-sizing: border-box; }
+  body { font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; color: #c3ccd6; -webkit-text-size-adjust: 100%; }
+  a { color: #9fb8cf; text-decoration: none; border-bottom: 1px solid rgba(159,184,207,0.35); }
+  a:hover { color: #dce7f2; border-bottom-color: #dce7f2; }
+  pre { margin: 0; font-family: inherit; }
+  @keyframes blink { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }
+  @keyframes typein { from { width: 0 } to { width: 100% } }
+  .page { padding: 56px 24px; display: flex; justify-content: center; }
+  .term { width: 100%; max-width: 900px; background: #0f1318; border: 1px solid #232b34; padding: 0 0 44px; font-size: 15px; line-height: 1.65; }
+  .bar { display: flex; gap: 8px; align-items: center; padding: 12px 18px; border-bottom: 1px solid #1c232b; color: #616b78; font-size: 12px; letter-spacing: 0.12em; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #2b333d; display: inline-block; }
+  .body { padding: 34px 40px 0; }
+  .banner { color: #8ccfdf; font-size: min(12px, calc((100vw - 48px) / 56.4)); line-height: 1.3; font-weight: 700; white-space: pre; overflow: hidden; }
+  .cmd { margin-top: 28px; color: #616b78; overflow-wrap: anywhere; }
+  .cmd .c { color: #c3ccd6; }
+  .hl { color: #8ccfdf; }
+  .rows { margin-top: 12px; display: grid; grid-template-columns: 164px minmax(0, 1fr); gap: 10px 22px; font-size: 14px; color: #aab5c1; }
+  .k { color: #616b78; }
+  .t { color: #eef4fa; }
+  .d { color: #8a949f; }
+  .chips { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { border: 1px solid #2b333d; padding: 3px 10px; font-size: 13px; color: #aab5c1; white-space: nowrap; }
+  .cert { margin-top: 10px; font-size: 14px; line-height: 1.6; color: #aab5c1; white-space: pre-wrap; }
+  .cursor { display: inline-block; width: 9px; height: 17px; background: #9fb8cf; vertical-align: -3px; animation: blink 1.1s steps(1) infinite; }
+  @media (max-width: 640px) {
+    .page { padding: 0; }
+    .term { border: 0; font-size: 14px; }
+    .body { padding: 26px 20px 0; }
+    .rows { grid-template-columns: minmax(0, 1fr); gap: 2px 0; }
+    .rows > .k, .rows > .s { margin-top: 12px; }
+    .rows > .k:first-child, .rows > .s:first-child { margin-top: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .cursor, .typed { animation: none !important; } }
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="term">
+    <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left: 10px;">john@nyc &mdash; zsh</span></div>
+    <div class="body">
+      <pre class="banner" aria-label="John Arias">          dBP dBBBBBBBP dBP   dBP dBBBBBBBP        dBBBBBBBP dBBBBBBBP dBP dBBBBBBBP dBBBBBBBP
+         dBP dBP   dBP dBP   dBP dBP   dBP        dBP   dBP dBP   dBP dBP dBP   dBP dBP
+        dBP dBP   dBP dBBBBBBBP dBP   dBP        dBBBBBBBP dBBBBP    dBP dBBBBBBBP dBBBBBBBP
+ dBP   dBP dBP   dBP dBP   dBP dBP   dBP        dBP   dBP dBP   dBP dBP dBP   dBP       dBP
+dBBBBBBBP dBBBBBBBP dBP   dBP dBP   dBP        dBP   dBP dBP   dBP dBP dBP   dBP dBBBBBBBP</pre>
+      <div class="cmd" style="margin-top: 30px;">$ <span class="c">cd <span class="hl" id="p">this-page</span></span></div>
+      <div style="margin-top: 8px; color: #aab5c1;">zsh: no such file or directory</div>
+      <div class="cmd">$ <span class="c">echo $?</span></div>
+      <div style="margin-top: 8px; color: #aab5c1;">404</div>
+      <div class="cmd">$ <span class="c">cd ~</span></div>
+      <div style="margin-top: 8px;"><a href="/">&larr; back to john.arias.sh</a></div>
+      <div class="cmd" style="margin-top: 30px;">$ <span class="cursor" aria-hidden="true"></span></div>
+    </div>
+  </div>
+</main>
+<script>try{var s=location.pathname.replace(/^\/+|\/+$/g,'');if(s)document.getElementById('p').textContent=s;}catch(e){}</script>
 <script data-goatcounter="https://stats.arias.sh/count" async src="//stats.arias.sh/count.js"></script>
-<body style="font-family: system-ui, sans-serif; text-align: center; margin-top: 20vh">
-  <h1>404</h1>
-  <p>Nothing here. <a href="/">Go home</a></p>
 </body>
 </html>
