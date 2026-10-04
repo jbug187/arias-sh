@@ -1,7 +1,7 @@
 # john.arias.sh
 
 Source for my personal site, **[john.arias.sh](https://john.arias.sh)**, and every piece of infrastructure behind it.
-Nothing here was clicked together in a portal: a merged pull request is the only way anything changes.
+A merged pull request is the only way anything changes.
 
 ## How it fits together
 
@@ -65,9 +65,3 @@ Privacy-friendly, cookie-free page counts by self-hosted [GoatCounter](https://w
 ## Running cost
 
 Roughly $50–60/month, almost all of it the single AKS node and its load balancer. The AKS control plane is on the Free tier.
-
-## Bootstrapping from scratch
-
-1. Run [`terraform/bootstrap/bootstrap.ps1`](terraform/bootstrap/bootstrap.ps1) once: it creates the state storage and the GitHub OIDC identity, and sets the repository variables.
-2. Set the `ADMIN_OBJECT_ID` and `DEPLOYER_OBJECT_ID` repository variables.
-3. Merge to `main`. The pipelines build everything else.
