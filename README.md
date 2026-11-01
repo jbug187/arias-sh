@@ -64,4 +64,12 @@ Privacy-friendly, cookie-free page counts by self-hosted [GoatCounter](https://w
 
 ## Running cost
 
-Roughly $50–60/month, almost all of it the single AKS node and its load balancer. The AKS control plane is on the Free tier.
+Roughly $45–50/month. The AKS control plane is on the Free tier.
+
+| Item | Per month |
+| --- | --- |
+| AKS node, `Standard_B2als_v2` on a 1-year reservation | ~$16 |
+| Standard load balancer | ~$18 |
+| Public IPs (ingress + outbound) | ~$7 |
+| Managed disks (node OS + GoatCounter data) | ~$5 |
+| DNS, Key Vault, state storage, bandwidth | ~$1 |
