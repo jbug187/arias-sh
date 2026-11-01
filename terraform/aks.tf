@@ -20,6 +20,11 @@ resource "azurerm_kubernetes_cluster" "main" {
   oidc_issuer_enabled       = true
   workload_identity_enabled = true
 
+  # Required since azurerm 5.0. Manual = the node pool below, not Node Auto Provisioning.
+  node_provisioning_profile {
+    mode = "Manual"
+  }
+
   default_node_pool {
     name                        = "system"
     vm_size                     = var.node_vm_size
